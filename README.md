@@ -97,6 +97,41 @@ Cada tarefa ten un ficheiro con nome `tarefa-XX-nome-descritivo.md` que inclúe:
 
 ---
 
+## Convención de mensaxes de Commit (*Conventional Commits*)
+
+Para que o historial de Git permita reconstruír automaticamente que se fixo en cada tarefa e canto tempo levou cada fase (por exemplo, filtrando con `git log --grep="(T2)"`), emprégase o formato **[Conventional Commits](https://www.conventionalcommits.org/)**:
+
+```text
+<tipo>(<ID-tarefa ou ámbito>): <descrición breve>
+```
+
+### Tipos de commit utilizados no proxecto
+
+| Tipo | Uso | Exemplos |
+|---|---|---|
+| **`chore`** | Cambios de estado no taboleiro (`BOARD.md`), actualización do backlog (`BACKLOG.md`), rexistros de IA nas fichas ou configuración. | `chore(T1): iniciar tarefa T1 en BOARD`<br>`chore(T2): pasar T2 a revision e cubrir rexistro IA`<br>`chore(backlog): validar T1 en Done e seleccionar T2` |
+| **`feat`** | Implementación dunha nova funcionalidade ou módulo no código. | `feat(T2): implementar lóxica do servizo principal`<br>`feat(T2): engadir endpoint e vista para a nova funcionalidade` |
+| **`fix`** | Corrección dun bug no código. | `fix(T3): corrixir tratamento de erros na validación de entrada` |
+| **`test`** | Creación ou modificación de tests (unitarios, integración, E2E). | `test(T2): engadir tests unitarios e E2E para a nova funcionalidade`<br>`test(T3): ampliar cobertura de tests no módulo central` |
+| **`docs`** | Documentación técnica, informes de arquitectura/auditoría ou creación de *skills*. | `docs(T1): engadir documento de arquitectura do sistema`<br>`docs(T2): crear skill para o desenvolvemento de novos módulos` |
+| **`refactor`** | Melloras na estrutura interna do código sen cambiar a funcionalidade. | `refactor(T3): simplificar acoplamento entre capas do servizo` |
+
+### Exemplo do ciclo completo dunha tarefa en Git (`git log --oneline`)
+
+1. **Inicio da tarefa (marca de tempo de comezo):**
+   - `chore(T2): iniciar tarefa T2 en BOARD`
+2. **Desenvolvemento asistido por IA:**
+   - `feat(T2): implementar lóxica de negocio da funcionalidade`
+   - `feat(T2): integrar funcionalidade na interface e API`
+   - `test(T2): engadir tests unitarios e E2E da funcionalidade`
+   - `docs(T2): crear skill reutilizable a partir da implementación`
+3. **Paso a revisión (marca de tempo de fin de implementación e rexistro de IA):**
+   - `chore(T2): pasar T2 a revision e cubrir rexistro IA`
+4. **Validación tras a defensa na reunión quincenal (marca de peche oficial):**
+   - `chore(T2): validar T2 en Done tras defensa`
+
+---
+
 ## Ferramentas de visualización (`plugins/`)
 
 Aínda que todos os artefactos (`BOARD.md`, `BACKLOG.md` e `tasks/*.md`) son ficheiros Markdown lexibles directamente en calquera editor ou en GitHub/GitLab, o repositorio inclúe na carpeta [`plugins/`](./plugins/) dúas ferramentas visuais para consultar o taboleiro Kanban, o estado das subtarefas, as etiquetas e o backlog dunha ollada:
