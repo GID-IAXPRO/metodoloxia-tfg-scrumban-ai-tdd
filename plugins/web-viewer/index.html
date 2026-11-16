@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="gl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrumban Board & Backlog Web Viewer</title>
+  <style>
+    :root[data-theme="dark"] {
+      --bg-page: #0d1117;
+      --bg-surface: #161b22;
+      --bg-card: #1f242d;
+      --bg-hover: #262c36;
+      --border-color: #30363d;
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-bg: rgba(56, 139, 253, 0.15);
+      --btn-primary-bg: #238636;
+      --btn-primary-hover: #2ea043;
+      --btn-primary-text: #ffffff;
+      --btn-sec-bg: #21262d;
+      --btn-sec-hover: #30363d;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    :root[data-theme="light"] {
+      --bg-page: #f6f8fa;
+      --bg-surface: #eaeef2;
+      --bg-card: #ffffff;
+      --bg-hover: #f3f4f6;
+      --border-color: #d0d7de;
+      --text-main: #1f2328;
+      --text-muted: #57606a;
+      --accent: #0969da;
+      --accent-bg: rgba(9, 105, 218, 0.1);
+      --btn-primary-bg: #1f883d;
+      --btn-primary-hover: #1a7f37;
+      --btn-primary-text: #ffffff;
+      --btn-sec-bg: #f3f4f6;
+      --btn-sec-hover: #e5e7eb;
+      --shadow: 0 2px 6px rgba(31, 35, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px 24px 48px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .top-title h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 3px 12px;
+      border-radius: 999px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      cursor: pointer;
+      font-size: 0.83rem;
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--btn-sec-bg);
+      color: var(--text-main);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--btn-sec-hover);
+    }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      border-color: transparent;
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+    }
+
+    .btn-accent {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Dropzone / Loader Banner */
+    .loader-panel {
+      background: var(--bg-surface);
+      border: 2px dashed var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .loader-panel.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .loader-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+    }
+
+    .loader-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .loader-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Section Headings */
+    .section-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 28px 0 14px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Board Grid */
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .board-col {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 240px;
+    }
+
+    .col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .col-header h3 {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    .col-count {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .col-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .empty-col {
+      padding: 28px 14px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      font-style: italic;
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+    }
+
+    .card-in-board {
+      border-left: 4px solid var(--accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .card-id {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      font-size: 0.84rem;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.71rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-must {
+      background: rgba(229, 83, 75, 0.18);
+      color: #ff7b72;
+      border: 1px solid rgba(229, 83, 75, 0.45);
+    }
+
+    .badge-should {
+      background: rgba(210, 153, 34, 0.18);
+      color: #d29922;
+      border: 1px solid rgba(210, 153, 34, 0.45);
+    }
+
+    .badge-could {
+      background: rgba(56, 139, 253, 0.18);
+      color: #58a6ff;
+      border: 1px solid rgba(56, 139, 253, 0.45);
+    }
+
+    .badge-active {
+      background: rgba(46, 160, 67, 0.2);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.45);
+    }
+
+    .card-title {
+      margin: 6px 0 8px 0;
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      font-size: 0.73rem;
+      padding: 1px 8px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+    }
+
+    .tag-feature { color: #58a6ff; border-color: rgba(88, 166, 255, 0.4); }
+    .tag-workflow { color: #bc8cff; border-color: rgba(188, 140, 255, 0.4); }
+    .tag-testing { color: #3fb950; border-color: rgba(63, 185, 80, 0.4); }
+    .tag-refactoring { color: #f0883e; border-color: rgba(240, 136, 62, 0.4); }
+    .tag-learning { color: #79c0ff; border-color: rgba(121, 192, 255, 0.4); }
+    .tag-ai { color: #ff7b72; border-color: rgba(255, 123, 114, 0.4); }
+    .tag-doc { color: #d29922; border-color: rgba(210, 153, 34, 0.4); }
+
+    .card-desc {
+      margin: 0 0 10px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-desc-empty {
+      font-style: italic;
+      opacity: 0.75;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .progress-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.79rem;
+      color: var(--text-muted);
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      margin-bottom: 10px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Ready & Candidates Grids */
+    .ready-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 16px;
+    }
+
+    .candidates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .candidate-group {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .candidate-group-title {
+      margin: 0 0 12px 0;
+      font-size: 0.96rem;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .candidate-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .candidate-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 0.86rem;
+    }
+
+    .candidate-done {
+      opacity: 0.65;
+      text-decoration: line-through;
+    }
+
+    .candidate-content {
+      flex: 1;
+    }
+
+    .candidate-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .candidate-est {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .candidate-extra {
+      margin: 0 0 6px 0;
+      font-size: 0.81rem;
+      color: var(--text-muted);
+    }
+
+    /* Markdown Modal / Drawer Viewer */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      justify-content: flex-end;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-drawer {
+      width: min(920px, 94vw);
+      height: 100vh;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .modal-body {
+      padding: 24px 32px 48px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Rendered Markdown Styles inside Modal */
+    .md-content h1, .md-content h2, .md-content h3 {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      margin-top: 24px;
+    }
+    .md-content h1 { font-size: 1.5rem; margin-top: 0; }
+    .md-content h2 { font-size: 1.2rem; }
+    .md-content h3 { font-size: 1.02rem; border-bottom: none; }
+    .md-content code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: var(--bg-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.86em;
+    }
+    .md-content pre {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .md-content blockquote {
+      margin: 12px 0;
+      padding: 8px 14px;
+      border-left: 4px solid var(--accent);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      border-radius: 0 6px 6px 0;
+    }
+    .md-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.88rem;
+    }
+    .md-content th, .md-content td {
+      border: 1px solid var(--border-color);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .md-content th {
+      background: var(--bg-surface);
+    }
+    .md-content ul {
+      padding-left: 22px;
+    }
+    .md-content li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="top-title">
+        <h1>📊 Scrumban Board & Product Backlog Viewer</h1>
+        <div class="top-stats" id="topStats">
+          <span class="stat-pill">📂 Selecciona ou arrastra unha carpeta con <strong>BOARD.md</strong> e <strong>BACKLOG.md</strong></span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="btnViewBoard" style="display:none" onclick="openMarkdownModal('BOARD.md')">📋 Ver BOARD.md</button>
+        <button class="btn" id="btnViewBacklog" style="display:none" onclick="openMarkdownModal('BACKLOG.md')">🗂️ Ver BACKLOG.md</button>
+        <button class="btn" id="btnViewScrumban" style="display:none" onclick="openMarkdownModal('SCRUMBAN')">📘 Metodoloxía</button>
+        <button class="btn" onclick="toggleTheme()">🌗 Tema</button>
+      </div>
+    </header>
+
+    <!-- File / Directory Loader Panel -->
+    <section class="loader-panel" id="dropZone">
+      <div class="loader-info">
+        <h3 id="loadedSourceTitle">📂 Cargar ficheiros do proxecto Scrumban</h3>
+        <p id="loadedSourceSubtitle">
+          Selecciona a carpeta do proxecto (ex. <code>tfg/</code>) para cargar automaticamente <code>BOARD.md</code>, <code>BACKLOG.md</code> e todas as fichas de <code>tasks/*.md</code>, ou arrástraos aquí.
+        </p>
+      </div>
+      <div class="loader-controls">
+        <label class="btn btn-primary" for="folderInput">
+          📁 Seleccionar Carpeta (BOARD + BACKLOG + tasks/)
+        </label>
+        <input type="file" id="folderInput" webkitdirectory directory multiple onchange="handleFileSelect(this.files)">
+
+        <label class="btn" for="filesInput">
+          📄 Seleccionar Ficheiros .md soltos
+        </label>
+        <input type="file" id="filesInput" multiple accept=".md" onchange="handleFileSelect(this.files)">
+
+        <button class="btn btn-accent" id="btnReloadHttp" onclick="tryAutoFetchProject()">
+          🔄 Cargar desde carpeta actual (HTTP)
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Dashboard Content -->
+    <div id="dashboardContent">
+      <!-- 1. BOARD.md -->
+      <div class="section-title">
+        <h2>1. Taboleiro Operativo do Ciclo (BOARD.md)</h2>
+        <span class="section-subtitle">Fluxo activo do estudante no ciclo de 10–15 días</span>
+      </div>
+      <main class="board-grid" id="boardGrid">
+        <div class="empty-col">Carga unha carpeta con BOARD.md para visualizar as columnas do taboleiro.</div>
+      </main>
+
+      <!-- 2. BACKLOG.md -> Ready -->
+      <div class="section-title">
+        <h2>2. Tarefas Planificadas en BACKLOG.md (Ready)</h2>
+        <span class="section-subtitle">Tarefas definidas con ficha en tasks/ listas para entrar en vindeiros ciclos</span>
+      </div>
+      <section id="readyContainer">
+        <div class="empty-col">Carga BACKLOG.md para visualizar as tarefas planificadas (Ready).</div>
+      </section>
+
+      <!-- 3. BACKLOG.md -> Product Backlog Candidates -->
+      <div class="section-title">
+        <h2>3. Backlog de Melloras Candidatas (Product Backlog MoSCoW)</h2>
+        <span class="section-subtitle">Funcionalidades e obxectivos candidatos pendentes de activar segundo o avance</span>
+      </div>
+      <section id="candidatesContainer">
+        <div class="empty-col">Carga BACKLOG.md para visualizar as melloras candidatas MoSCoW.</div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Markdown Preview Modal Drawer -->
+  <div class="modal-backdrop" id="mdModal" onclick="if(event.target === this) closeMarkdownModal()">
+    <div class="modal-drawer">
+      <header class="modal-header">
+        <h3 id="mdModalTitle">ficha.md</h3>
+        <button class="btn" onclick="closeMarkdownModal()">✖ Pechar (Esc)</button>
+      </header>
+      <div class="modal-body md-content" id="mdModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // In-memory store of loaded markdown files: { "BOARD.md": "...", "tasks/tarefa-01...md": "..." }
+    let fileStore = {};
+    let currentBaseFetchPath = '';
+
+    // ---------------- UTILITIES & PARSER ----------------
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function cleanText(str) {
+      if (!str) return '';
+      return str
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/`(.*?)`/g, '$1')
+        .trim();
+    }
+
+    function parseTags(cell) {
+      if (!cell || cell === '—' || cell === '-') return [];
+      const matches = [...cell.matchAll(/`([^`]+)`/g)].map(m => m[1].trim());
+      if (matches.length > 0) return matches;
+      return cell.split(',').map(s => cleanText(s)).filter(Boolean);
+    }
+
+    function parseLink(cell) {
+      if (!cell) return null;
+      const match = cell.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (!match) return null;
+      return {
+        label: cleanText(match[1]),
+        href: match[2].trim().replace(/^\.\//, '')
+      };
+    }
+
+    function findFileContent(relPath) {
+      if (!relPath) return null;
+      const normalized = relPath.replace(/^\.\//, '').replace(/^\/+/, '');
+      if (fileStore[normalized] !== undefined) {
+        return { key: normalized, content: fileStore[normalized] };
+      }
+      const baseName = normalized.split('/').pop();
+      for (const k of Object.keys(fileStore)) {
+        if (k.endsWith('/' + normalized) || k === baseName || k.endsWith('/' + baseName)) {
+          return { key: k, content: fileStore[k] };
+        }
+      }
+      return null;
+    }
+
+    function parseTaskContent(relHref) {
+      const found = findFileContent(relHref);
+      if (!found) {
+        return {
+          fileKey: relHref,
+          exists: false,
+          description: '',
+          objectivesTotal: 0,
+          objectivesDone: 0
+        };
+      }
+
+      const content = found.content;
+      const lines = content.split(/\r?\n/);
+
+      let inDesc = false;
+      const descLines = [];
+      for (const line of lines) {
+        if (/^##\s+1\.\s+/i.test(line)) {
+          inDesc = true;
+          continue;
+        }
+        if (inDesc) {
+          if (/^##\s+/.test(line)) break;
+          const trimmed = line.trim();
+          if (trimmed.startsWith('>') || trimmed.startsWith('###')) continue;
+          if (trimmed) descLines.push(cleanText(trimmed));
+        }
+      }
+
+      const unchecked = (content.match(/^-\s*\[\s\]/gm) || []).length;
+      const checked = (content.match(/^-\s*\[[xX]\]/gm) || []).length;
+      const prioMatch = content.match(/^-\s*\*\*Prioridade:\*\*\s*(.+)$/m);
+      const tagsMatch = content.match(/^-\s*\*\*Etiquetas:\*\*\s*(.+)$/m);
+
+      const fullDesc = descLines.join(' ');
+      return {
+        fileKey: found.key,
+        exists: true,
+        description: fullDesc.slice(0, 360) + (fullDesc.length > 360 ? '…' : ''),
+        objectivesTotal: unchecked + checked,
+        objectivesDone: checked,
+        filePriority: prioMatch ? cleanText(prioMatch[1]) : '',
+        fileTags: tagsMatch ? parseTags(tagsMatch[1]) : []
+      };
+    }
+
+    function parseTableRows(sectionLines) {
+      const tableLines = sectionLines
+        .map(l => l.trim())
+        .filter(l => l.startsWith('|') && l.endsWith('|'));
+
+      if (tableLines.length < 2) return [];
+
+      const headers = tableLines[0]
+        .slice(1, -1)
+        .split('|')
+        .map(h => cleanText(h).toLowerCase());
+
+      const rows = [];
+      for (let i = 2; i < tableLines.length; i++) {
+        const rawCells = tableLines[i]
+          .slice(1, -1)
+          .split('|')
+          .map(c => c.trim());
+
+        const firstCell = cleanText(rawCells[0] || '');
+        if (!firstCell || firstCell === '—' || firstCell === '-') continue;
+
+        const rowObj = {};
+        headers.forEach((h, idx) => {
+          rowObj[h] = rawCells[idx] !== undefined ? rawCells[idx] : '';
+        });
+        rows.push({ headers, cells: rawCells, map: rowObj });
+      }
+      return rows;
+    }
+
+    function buildCardFromRow(row) {
+      const m = row.map;
+      const id = cleanText(m['id'] || row.cells[0] || '');
+      const title = cleanText(m['tarefa'] || row.cells[1] || '');
+
+      let link = parseLink(m['ficha']);
+      if (!link) {
+        for (const cell of row.cells) {
+          const candidate = parseLink(cell);
+          if (candidate) {
+            link = candidate;
+            break;
+          }
+        }
+      }
+
+      const taskDetails = link ? parseTaskContent(link.href) : null;
+
+      let priority = cleanText(m['prioridade'] || '');
+      if (!priority && taskDetails && taskDetails.filePriority) {
+        priority = taskDetails.filePriority;
+      }
+
+      let tags = parseTags(m['etiquetas'] || '');
+      if (tags.length === 0 && taskDetails && taskDetails.fileTags) {
+        tags = taskDetails.fileTags;
+      }
+
+      const hoursEst = cleanText(m['horas est.'] || m['horas estimadas'] || '');
+      const hoursReal = cleanText(m['horas reais'] || m['horas acumuladas'] || '');
+      const phase = cleanText(m['fase actual (análise / deseño / impl. / tests)'] || m['fase actual'] || '');
+      const startDate = cleanText(m['data inicio'] || '');
+      const closeDate = cleanText(m['data validación'] || m['data peche'] || '');
+      const aiSheet = cleanText(m['ficha ia cuberta'] || '');
+
+      return {
+        id,
+        title,
+        priority,
+        tags,
+        hoursEst: hoursEst !== '—' ? hoursEst : '',
+        hoursReal: hoursReal !== '—' ? hoursReal : '',
+        phase: phase !== '—' ? phase : '',
+        startDate: startDate !== '—' ? startDate : '',
+        closeDate: closeDate !== '—' ? closeDate : '',
+        aiSheet: aiSheet !== '—' ? aiSheet : '',
+        link,
+        taskDetails
+      };
+    }
+
+    function splitSectionsByH2(content) {
+      const lines = content.split(/\r?\n/);
+      const sections = [];
+      let current = null;
+      for (const line of lines) {
+        const match = line.match(/^##\s+(.+)$/);
+        if (match) {
+          if (current) sections.push(current);
+          current = { title: cleanText(match[1]), lines: [] };
+        } else if (current) {
+          current.lines.push(line);
+        }
+      }
+      if (current) sections.push(current);
+      return sections;
+    }
+
+    function parseCandidateGroups(lines) {
+      const groups = [];
+      let currentGroup = { title: 'Xeral', items: [] };
+
+      for (const line of lines) {
+        const h3 = line.match(/^###\s+(.+)$/);
+        if (h3) {
+          if (currentGroup.items.length > 0) groups.push(currentGroup);
+          currentGroup = { title: cleanText(h3[1]), items: [] };
+          continue;
+        }
+
+        const itemMatch = line.match(/^-\s*\[([ xX])\]\s+(.+)$/);
+        if (itemMatch) {
+          const done = itemMatch[1].toLowerCase() === 'x';
+          const rawText = itemMatch[2];
+          const tags = parseTags(rawText);
+          const boldMatch = rawText.match(/\*\*(.+?)\*\*/);
+          const title = boldMatch ? cleanText(boldMatch[1]) : cleanText(rawText);
+          const estMatch = rawText.match(/Est\.?:\s*([0-9]+\s*h)/i);
+          const hoursEst = estMatch ? estMatch[1] : '';
+
+          let extra = rawText
+            .replace(/\*\*(.+?)\*\*/, '')
+            .replace(/\((`[^)]+`)\)/g, '')
+            .replace(/^[—\-\s.]+/, '')
+            .trim();
+          extra = cleanText(extra);
+
+          currentGroup.items.push({ done, title, tags, hoursEst, extra });
+        }
+      }
+      if (currentGroup.items.length > 0) groups.push(currentGroup);
+      return groups;
+    }
+
+    function parseLoadedStore() {
+      const boardFile = findFileContent('BOARD.md');
+      const backlogFile = findFileContent('BACKLOG.md');
+
+      const result = {
+        hasBoard: Boolean(boardFile),
+        hasBacklog: Boolean(backlogFile),
+        hasScrumban: Boolean(findFileContent('SCRUMBAN.md') || findFileContent('SCRUNBAN.md')),
+        budgetSummary: '',
+        doneHoursSummary: '',
+        wipLimit: '',
+        boardColumns: [],
+        backlogReady: [],
+        backlogCandidates: [],
+        backlogDone: []
+      };
+
+      if (boardFile) {
+        const wipMatch = boardFile.content.match(/\*\*Límite WIP[^*]*\*\*:\s*(.+)$/m);
+        if (wipMatch) result.wipLimit = cleanText(wipMatch[1]);
+
+        const boardSections = splitSectionsByH2(boardFile.content);
+        for (const sec of boardSections) {
+          const lower = sec.title.toLowerCase();
+          if (lower.includes('backlog')) {
+            if (result.backlogCandidates.length === 0) {
+              result.backlogCandidates = parseCandidateGroups(sec.lines);
+            }
+            continue;
+          }
+          const rows = parseTableRows(sec.lines);
+          result.boardColumns.push({
+            title: sec.title,
+            cards: rows.map(r => buildCardFromRow(r))
+          });
+        }
+      }
+
+      if (backlogFile) {
+        const budgetMatch = backlogFile.content.match(/\*\*Orzamento total[^*]*\*\*:\s*(.+)$/m);
+        const doneHoursMatch = backlogFile.content.match(/\*\*Horas (?:validadas|completadas)[^*]*\*\*:\s*(.+)$/m);
+        if (budgetMatch) result.budgetSummary = cleanText(budgetMatch[1]);
+        if (doneHoursMatch) result.doneHoursSummary = cleanText(doneHoursMatch[1]);
+
+        const backlogSections = splitSectionsByH2(backlogFile.content);
+        for (const sec of backlogSections) {
+          const lower = sec.title.toLowerCase();
+          if (lower.includes('ready') || lower.includes('planificadas')) {
+            result.backlogReady = parseTableRows(sec.lines).map(r => buildCardFromRow(r));
+          } else if (lower.includes('done') || lower.includes('completadas') || lower.includes('histórico')) {
+            result.backlogDone = parseTableRows(sec.lines).map(r => buildCardFromRow(r));
+          } else if (lower.includes('backlog') || lower.includes('candidatas')) {
+            result.backlogCandidates = parseCandidateGroups(sec.lines);
+          }
+        }
+      }
+
+      const activeIds = new Set();
+      for (const col of result.boardColumns) {
+        for (const c of col.cards) {
+          if (c.id) activeIds.add(c.id);
+        }
+      }
+      result.backlogReady = result.backlogReady.map(c => ({
+        ...c,
+        inBoard: activeIds.has(c.id)
+      }));
+
+      return result;
+    }
+
+    // ---------------- RENDERING ----------------
+
+    function getPriorityBadgeClass(priority) {
+      const p = (priority || '').toLowerCase();
+      if (p.includes('must')) return 'badge-must';
+      if (p.includes('should')) return 'badge-should';
+      if (p.includes('could')) return 'badge-could';
+      return 'badge-default';
+    }
+
+    function getTagColorClass(tag) {
+      const t = (tag || '').toLowerCase();
+      if (t.includes('feature')) return 'tag-feature';
+      if (t.includes('workflow')) return 'tag-workflow';
+      if (t.includes('testing')) return 'tag-testing';
+      if (t.includes('refactoring')) return 'tag-refactoring';
+      if (t.includes('learning')) return 'tag-learning';
+      if (t.includes('ai-evaluation')) return 'tag-ai';
+      if (t.includes('documentation')) return 'tag-doc';
+      return 'tag-default';
+    }
+
+    function renderCardHtml(card, options = {}) {
+      const prioBadge = card.priority
+        ? `<span class="badge ${getPriorityBadgeClass(card.priority)}">${escapeHtml(card.priority)}</span>`
+        : '';
+
+      const inBoardBadge = options.showInBoardBadge && card.inBoard
+        ? `<span class="badge badge-active">No Ciclo (BOARD)</span>`
+        : '';
+
+      const tagsHtml = (card.tags || [])
+        .map(t => `<span class="tag ${getTagColorClass(t)}">${escapeHtml(t)}</span>`)
+        .join('');
+
+      const desc = card.taskDetails && card.taskDetails.description
+        ? `<p class="card-desc">${escapeHtml(card.taskDetails.description)}</p>`
+        : `<p class="card-desc card-desc-empty">Fai clic en "Abrir Visor MD" ou carga a carpeta tasks/ para ver a descrición.</p>`;
+
+      let progressHtml = '';
+      if (card.taskDetails && card.taskDetails.objectivesTotal > 0) {
+        const done = card.taskDetails.objectivesDone;
+        const total = card.taskDetails.objectivesTotal;
+        const pct = Math.round((done / total) * 100);
+        progressHtml = `
+          <div class="progress-wrap" title="Subtarefas / Obxectivos completados na ficha">
+            <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
+            <span class="progress-label">☑ ${done}/${total} (${pct}%)</span>
+          </div>
+        `;
+      }
+
+      const metaItems = [];
+      if (card.hoursEst) metaItems.push(`<span>⏱ Est: <strong>${escapeHtml(card.hoursEst)}</strong></span>`);
+      if (card.hoursReal) metaItems.push(`<span>⌛ Real: <strong>${escapeHtml(card.hoursReal)}</strong></span>`);
+      if (card.phase) metaItems.push(`<span>🔄 Fase: <strong>${escapeHtml(card.phase)}</strong></span>`);
+      if (card.startDate) metaItems.push(`<span>📅 Inicio: ${escapeHtml(card.startDate)}</span>`);
+      if (card.closeDate) metaItems.push(`<span>✅ Peche: ${escapeHtml(card.closeDate)}</span>`);
+      if (card.aiSheet) metaItems.push(`<span>🤖 Ficha IA: ${escapeHtml(card.aiSheet)}</span>`);
+
+      const targetHref = card.link ? card.link.href : '';
+      const actionsHtml = targetHref
+        ? `
+          <div class="card-actions">
+            <button class="btn btn-primary" onclick="openMarkdownModal('${escapeHtml(targetHref)}')">
+              📖 Abrir Visor MD
+            </button>
+          </div>
+        `
+        : '';
+
+      return `
+        <article class="card ${card.inBoard && options.showInBoardBadge ? 'card-in-board' : ''}">
+          <div class="card-header">
+            <span class="card-id">${escapeHtml(card.id || 'T?')}</span>
+            <div class="card-badges">
+              ${inBoardBadge}
+              ${prioBadge}
+            </div>
+          </div>
+          <h4 class="card-title">${escapeHtml(card.title)}</h4>
+          ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
+          ${desc}
+          ${progressHtml}
+          ${metaItems.length > 0 ? `<div class="card-meta">${metaItems.join('')}</div>` : ''}
+          ${actionsHtml}
+        </article>
+      `;
+    }
+
+    function renderDashboard() {
+      const data = parseLoadedStore();
+
+      // Update Top Buttons & Stats
+      document.getElementById('btnViewBoard').style.display = data.hasBoard ? 'inline-flex' : 'none';
+      document.getElementById('btnViewBacklog').style.display = data.hasBacklog ? 'inline-flex' : 'none';
+      document.getElementById('btnViewScrumban').style.display = data.hasScrumban ? 'inline-flex' : 'none';
+
+      const statsParts = [];
+      if (data.budgetSummary) statsParts.push(`<span class="stat-pill">🎯 Orzamento: <strong>${escapeHtml(data.budgetSummary)}</strong></span>`);
+      if (data.doneHoursSummary) statsParts.push(`<span class="stat-pill">✅ Horas en Done: <strong>${escapeHtml(data.doneHoursSummary)}</strong></span>`);
+      if (data.wipLimit) statsParts.push(`<span class="stat-pill">🚦 WIP: <strong>${escapeHtml(data.wipLimit)}</strong></span>`);
+      if (statsParts.length > 0) {
+        document.getElementById('topStats').innerHTML = statsParts.join('');
+      }
+
+      // 1. Render Board Columns
+      const columns = [...data.boardColumns];
+      if (data.backlogDone && data.backlogDone.length > 0) {
+        columns.push({
+          title: '4. Validadas en Done (BACKLOG)',
+          cards: data.backlogDone
+        });
+      }
+
+      if (columns.length > 0) {
+        document.getElementById('boardGrid').innerHTML = columns.map(col => `
+          <section class="board-col">
+            <header class="col-header">
+              <h3>${escapeHtml(col.title)}</h3>
+              <span class="col-count">${col.cards.length}</span>
+            </header>
+            <div class="col-body">
+              ${col.cards.length > 0
+                ? col.cards.map(c => renderCardHtml(c)).join('')
+                : `<div class="empty-col">Sen tarefas neste estado</div>`}
+            </div>
+          </section>
+        `).join('');
+      }
+
+      // 2. Render Ready Cards
+      if (data.backlogReady.length > 0) {
+        document.getElementById('readyContainer').innerHTML = `
+          <div class="ready-grid">
+            ${data.backlogReady.map(c => renderCardHtml(c, { showInBoardBadge: true })).join('')}
+          </div>
+        `;
+      } else if (data.hasBacklog) {
+        document.getElementById('readyContainer').innerHTML = `<div class="empty-col">Non hai tarefas na táboa Ready de BACKLOG.md</div>`;
+      }
+
+      // 3. Render Candidate Groups
+      if (data.backlogCandidates.length > 0) {
+        document.getElementById('candidatesContainer').innerHTML = `
+          <div class="candidates-grid">
+            ${data.backlogCandidates.map(group => `
+              <div class="candidate-group">
+                <h4 class="candidate-group-title">${escapeHtml(group.title)}</h4>
+                <ul class="candidate-list">
+                  ${group.items.map(item => `
+                    <li class="candidate-item ${item.done ? 'candidate-done' : ''}">
+                      <span>${item.done ? '☑️' : '⬜'}</span>
+                      <div class="candidate-content">
+                        <div class="candidate-top">
+                          <strong>${escapeHtml(item.title)}</strong>
+                          ${item.hoursEst ? `<span class="candidate-est">⏱ ${escapeHtml(item.hoursEst)}</span>` : ''}
+                        </div>
+                        ${item.extra ? `<p class="candidate-extra">${escapeHtml(item.extra)}</p>` : ''}
+                        ${item.tags && item.tags.length > 0
+                          ? `<div class="card-tags">${item.tags.map(t => `<span class="tag ${getTagColorClass(t)}">${escapeHtml(t)}</span>`).join('')}</div>`
+                          : ''}
+                      </div>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    // ---------------- SIMPLE MARKDOWN RENDERER FOR MODAL ----------------
+
+    function formatInlineMarkdown(text) {
+      let out = escapeHtml(text);
+      out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+      out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, href) => {
+        if (href.endsWith('.md')) {
+          return `<a href="#" onclick="openMarkdownModal('${href.replace(/^\.\//, '')}'); return false;" style="color:var(--accent)">${label}</a>`;
+        }
+        return `<a href="${href}" target="_blank" rel="noopener" style="color:var(--accent)">${label}</a>`;
+      });
+      return out;
+    }
+
+    function renderMarkdownToHtml(md) {
+      const lines = md.split(/\r?\n/);
+      let html = '';
+      let inCode = false;
+      let inList = false;
+      let tableBuffer = [];
+
+      function flushTable() {
+        if (tableBuffer.length < 2) {
+          tableBuffer = [];
+          return;
+        }
+        const headers = tableBuffer[0].slice(1, -1).split('|').map(c => formatInlineMarkdown(c.trim()));
+        let t = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+        for (let i = 2; i < tableBuffer.length; i++) {
+          const cells = tableBuffer[i].slice(1, -1).split('|').map(c => formatInlineMarkdown(c.trim()));
+          t += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        }
+        t += '</tbody></table>';
+        html += t;
+        tableBuffer = [];
+      }
+
+      for (const line of lines) {
+        if (line.trim().startsWith('```')) {
+          flushTable();
+          if (inList) { html += '</ul>'; inList = false; }
+          html += inCode ? '</code></pre>' : '<pre><code>';
+          inCode = !inCode;
+          continue;
+        }
+        if (inCode) {
+          html += escapeHtml(line) + '\n';
+          continue;
+        }
+
+        const trimmed = line.trim();
+        if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+          if (inList) { html += '</ul>'; inList = false; }
+          tableBuffer.push(trimmed);
+          continue;
+        } else {
+          flushTable();
+        }
+
+        if (/^---+$/.test(trimmed)) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += '<hr style="border:none;border-top:1px solid var(--border-color);margin:20px 0">';
+        } else if (/^###\s+(.+)/.test(trimmed)) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<h3>${formatInlineMarkdown(trimmed.replace(/^###\s+/, ''))}</h3>`;
+        } else if (/^##\s+(.+)/.test(trimmed)) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<h2>${formatInlineMarkdown(trimmed.replace(/^##\s+/, ''))}</h2>`;
+        } else if (/^#\s+(.+)/.test(trimmed)) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<h1>${formatInlineMarkdown(trimmed.replace(/^#\s+/, ''))}</h1>`;
+        } else if (trimmed.startsWith('>')) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<blockquote>${formatInlineMarkdown(trimmed.replace(/^>\s*/, ''))}</blockquote>`;
+        } else if (/^-\s+(.+)/.test(trimmed)) {
+          if (!inList) { html += '<ul>'; inList = true; }
+          let itemText = trimmed.replace(/^-\s+/, '');
+          itemText = itemText
+            .replace(/^\[\s\]\s*/, '⬜ ')
+            .replace(/^\[[xX]\]\s*/, '☑️ ');
+          html += `<li>${formatInlineMarkdown(itemText)}</li>`;
+        } else if (trimmed === '') {
+          if (inList) { html += '</ul>'; inList = false; }
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<p>${formatInlineMarkdown(trimmed)}</p>`;
+        }
+      }
+      flushTable();
+      if (inList) html += '</ul>';
+      return html;
+    }
+
+    async function openMarkdownModal(relHref) {
+      if (relHref === 'SCRUMBAN') {
+        const s = findFileContent('SCRUMBAN.md') || findFileContent('SCRUNBAN.md');
+        if (s) relHref = s.key;
+      }
+
+      let found = findFileContent(relHref);
+
+      // If running via HTTP and task file wasn't preloaded yet, try fetching it on the fly
+      if (!found && currentBaseFetchPath !== null) {
+        try {
+          const cleanHref = relHref.replace(/^\.\//, '');
+          const resp = await fetch(currentBaseFetchPath + cleanHref);
+          if (resp.ok) {
+            const text = await resp.text();
+            fileStore[cleanHref] = text;
+            found = { key: cleanHref, content: text };
+            renderDashboard();
+          }
+        } catch (_) {}
+      }
+
+      document.getElementById('mdModalTitle').textContent = found ? found.key : relHref;
+      document.getElementById('mdModalBody').innerHTML = found
+        ? renderMarkdownToHtml(found.content)
+        : `<p>Non se atopou o ficheiro <code>${escapeHtml(relHref)}</code> en memoria. Selecciona a carpeta completa do proxecto (incluíndo <code>tasks/</code>) para visualizalo.</p>`;
+
+      document.getElementById('mdModal').classList.add('open');
+    }
+
+    function closeMarkdownModal() {
+      document.getElementById('mdModal').classList.remove('open');
+    }
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMarkdownModal();
+    });
+
+    // ---------------- FILE LOADING & DRAG-AND-DROP ----------------
+
+    async function handleFileSelect(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      let loadedCount = 0;
+
+      for (const file of fileList) {
+        if (!file.name.endsWith('.md')) continue;
+        const text = await file.text();
+        // Normalize relative path inside selected folder
+        let rel = file.webkitRelativePath || file.name;
+        const parts = rel.split('/');
+        if (parts.length > 1) {
+          rel = parts.slice(1).join('/');
+        }
+        fileStore[rel] = text;
+        loadedCount++;
+      }
+
+      document.getElementById('loadedSourceTitle').textContent = `✅ Proxecto cargado (${loadedCount} ficheiros Markdown)`;
+      document.getElementById('loadedSourceSubtitle').textContent = `Ficheiros activos en memoria: ${Object.keys(fileStore).join(', ')}`;
+      renderDashboard();
+    }
+
+    // Drag & Drop support
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', async e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        await handleFileSelect(e.dataTransfer.files);
+      }
+    });
+
+    // Try auto-loading via HTTP fetch if served from a web server (e.g. python3 -m http.server)
+    async function tryAutoFetchProject() {
+      const candidateBases = ['./', '../../', '../', './tfg/'];
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('path')) {
+        candidateBases.unshift(params.get('path').replace(/\/?$/, '/'));
+      }
+
+      for (const base of candidateBases) {
+        try {
+          const [boardResp, backlogResp] = await Promise.all([
+            fetch(base + 'BOARD.md'),
+            fetch(base + 'BACKLOG.md')
+          ]);
+
+          if (boardResp.ok || backlogResp.ok) {
+            currentBaseFetchPath = base;
+            fileStore = {};
+            if (boardResp.ok) fileStore['BOARD.md'] = await boardResp.text();
+            if (backlogResp.ok) fileStore['BACKLOG.md'] = await backlogResp.text();
+
+            // Also try fetching SCRUMBAN.md / SCRUNBAN.md
+            for (const docName of ['SCRUMBAN.md', 'SCRUNBAN.md', 'README.md']) {
+              try {
+                const r = await fetch(base + docName);
+                if (r.ok) fileStore[docName] = await r.text();
+              } catch (_) {}
+            }
+
+            // Extract all linked task files from BOARD.md and BACKLOG.md and fetch them
+            const combined = (fileStore['BOARD.md'] || '') + '\n' + (fileStore['BACKLOG.md'] || '');
+            const links = [...combined.matchAll(/\[[^\]]+\]\(([^)]+\.md)\)/g)].map(m => m[1].replace(/^\.\//, ''));
+            const uniqueLinks = [...new Set(links)];
+
+            await Promise.all(uniqueLinks.map(async href => {
+              try {
+                const r = await fetch(base + href);
+                if (r.ok) fileStore[href] = await r.text();
+              } catch (_) {}
+            }));
+
+            document.getElementById('loadedSourceTitle').textContent = `🌐 Proxecto cargado automaticamente desde "${base}"`;
+            document.getElementById('loadedSourceSubtitle').textContent = `Podes pulsar "🔄 Cargar desde carpeta actual (HTTP)" para refrescar os cambios.`;
+            renderDashboard();
+            return;
+          }
+        } catch (_) {
+          // Ignore fetch errors when opened via file://
+        }
+      }
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const current = root.getAttribute('data-theme') || 'dark';
+      root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    // Attempt auto-fetch on startup
+    if (window.location.protocol.startsWith('http')) {
+      tryAutoFetchProject();
+    }
+  </script>
+</body>
+</html>

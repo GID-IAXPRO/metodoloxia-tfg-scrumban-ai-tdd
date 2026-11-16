@@ -1,0 +1,50 @@
+{
+  "name": "scrumban-board-viewer",
+  "displayName": "Scrumban Board & Backlog Viewer",
+  "description": "Visor interactivo Kanban e Product Backlog para proxectos xestionados con BOARD.md, BACKLOG.md e fichas en tasks/*.md",
+  "version": "0.1.0",
+  "publisher": "sing-group",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/BOARD.md",
+    "workspaceContains:**/BACKLOG.md",
+    "onCommand:scrumban.openBoard"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "scrumban.openBoard",
+        "title": "Scrumban: Open Board & Backlog Viewer",
+        "icon": "$(project)"
+      },
+      {
+        "command": "scrumban.refreshBoard",
+        "title": "Scrumban: Refresh Board",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceFilename == BOARD.md || resourceFilename == BACKLOG.md || resourceFilename == SCRUMBAN.md || resourceFilename == SCRUNBAN.md",
+          "command": "scrumban.openBoard",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceFilename == BOARD.md || resourceFilename == BACKLOG.md",
+          "command": "scrumban.openBoard",
+          "group": "navigation"
+        }
+      ]
+    }
+  }
+}

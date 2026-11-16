@@ -1,0 +1,9 @@
+# Artefactos empaquetados de extensións VS Code
+*.vsix
+
+# Dependencias de Node (se nalgún momento se usan)
+node_modules/
+
+# Ficheiros temporais do sistema / Python / IDE
+.DS_Store
+__pycache__/

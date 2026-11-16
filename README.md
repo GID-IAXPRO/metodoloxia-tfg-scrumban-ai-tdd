@@ -31,11 +31,14 @@ En lugar de empregar ferramentas externas complexas, todo o seguimento metodoló
 ├── SCRUMBAN.md        # Definición detallada da metodoloxía Scrumban + Protocolo AIDD
 ├── BACKLOG.md         # Product Backlog (xestionado polo titor: Ready, Candidatas e Done)
 ├── BOARD.md           # Taboleiro operativo do ciclo actual (xestionado polo estudante)
-└── tasks/             # Fichas individuais de cada tarefa do proxecto
-    ├── _PLANTILLA.md
-    ├── tarefa-01-familiarizacion-arquitectura.md
-    ├── tarefa-02-primeira-funcionalidade-skills.md
-    └── tarefa-03-auditoria-e-tests.md
+├── tasks/             # Fichas individuais de cada tarefa do proxecto
+│   ├── _PLANTILLA.md
+│   ├── tarefa-01-familiarizacion-arquitectura.md
+│   ├── tarefa-02-primeira-funcionalidade-skills.md
+│   └── tarefa-03-auditoria-e-tests.md
+└── plugins/           # Ferramentas visuais para consultar BOARD.md, BACKLOG.md e tasks/
+    ├── vscode-scrumban/   # Extensión de VS Code (visor Kanban + Backlog integrado)
+    └── web-viewer/        # Visor web autónomo (index.html sen dependencias)
 ```
 
 ### 1. O Backlog de Produto (`BACKLOG.md`) — *Rol principal: Profesor / Product Owner*
@@ -91,3 +94,17 @@ Cada tarefa ten un ficheiro con nome `tarefa-XX-nome-descritivo.md` que inclúe:
      2. **Garantía mediante tests (Unitarios e E2E):** Demostrar con probas automatizadas (unitarias, de integración ou *end-to-end*) que a funcionalidade cumpre os requisitos, cobre casos límite e non introduce regresións.
      3. **Responsabilidade (*Ownership*) ante fallos:** O estudante é o responsable último do código entregado. Debe demostrar supervisión sobre o que fixo o axente e ser quen de responder, diagnosticar e corrixir calquera fallo inesperado ou comportamento non supervisado que xurda.
    - **Commit de validación (`In Review` → `Done`):** Unha vez superada a defensa, pásase a tarefa ao histórico `Done` de `BACKLOG.md`, selecciónanse as tarefas do seguinte ciclo en `BOARD.md` e faise un commit de peche de ciclo (ex. `chore(backlog): validar T2 en Done e planificar seguinte ciclo`). Se se detecta unha débeda cognitiva elevada ou falta de garantías nos tests, a tarefa permanece en revisión ata consolidarse.
+
+---
+
+## Ferramentas de visualización (`plugins/`)
+
+Aínda que todos os artefactos (`BOARD.md`, `BACKLOG.md` e `tasks/*.md`) son ficheiros Markdown lexibles directamente en calquera editor ou en GitHub/GitLab, o repositorio inclúe na carpeta [`plugins/`](./plugins/) dúas ferramentas visuais para consultar o taboleiro Kanban, o estado das subtarefas, as etiquetas e o backlog dunha ollada:
+
+1. **Extensión para VS Code ([`plugins/vscode-scrumban/`](./plugins/vscode-scrumban/README.md)):**
+   - Engade un visor interactivo dentro de Visual Studio Code que detecta automaticamente `BOARD.md` e `BACKLOG.md`.
+   - Mostra as columnas do taboleiro activo, as tarefas `Ready` e as melloras candidatas MoSCoW debaixo, extraendo a descrición e o progreso de cada ficha `tasks/tarefa-XX-...md` e permitindo abrir directamente o visor de Markdown de VS Code.
+   - Xérase o paquete instalable `.vsix` executando `python3 plugins/vscode-scrumban/build-vsix.py`.
+2. **Visor Web Independente ([`plugins/web-viewer/`](./plugins/web-viewer/README.md)):**
+   - Aplicación web autónoma nun único ficheiro [`plugins/web-viewer/index.html`](./plugins/web-viewer/index.html) sen dependencias externas.
+   - Permite seleccionar ou arrastrar a carpeta do proxecto directamente no navegador (ou servila por HTTP) para visualizar o taboleiro Scrumban, o `BACKLOG.md` e abrir calquera ficha cun visor Markdown lateral integrado.
