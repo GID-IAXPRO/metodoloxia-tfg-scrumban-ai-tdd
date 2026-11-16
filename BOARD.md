@@ -4,7 +4,8 @@
 > Este taboleiro reflicte o traballo en curso durante o **ciclo actual de 10–15 días**. As tarefas tómanse da sección `Ready` de [`BACKLOG.md`](./BACKLOG.md) e móvense por este taboleiro mentres se executan.  
 > Unha vez que o estudante remata unha tarefa (código, tests e rexistro de IA), déixaa en **Pendentes de revisión e defensa**. Só pasará á lista `Done` de `BACKLOG.md` tras ser defendida e validada na reunión co titor.
 
-**Límite WIP (*Work In Progress*):** Máximo **1 tarefa de desenvolvemento principal en curso** na sección *En progreso*.
+**Límite WIP (*Work In Progress*):** Máximo **1 tarefa de desenvolvemento principal en curso** na sección *En progreso*.  
+**Regra de trazabilidade:** **En cada cambio de estado dunha tarefa neste taboleiro é obrigatorio facer un commit en Git** indicando a transición (p. ex., ao pasala a *En progreso* e ao pasala a *Pendentes de revisión*), así como actualizar a súa ficha en [`tasks/`](./tasks/). Isto permite avaliar obxectivamente que se fixo e canto tempo levou cada fase.
 
 ---
 

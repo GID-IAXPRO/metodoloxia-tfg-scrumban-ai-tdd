@@ -66,22 +66,28 @@ Cada tarefa ten un ficheiro con nome `tarefa-XX-nome-descritivo.md` que inclúe:
 
 ---
 
-## Fluxo de traballo e Reunións de Defensa (cada 10–15 días)
+## Fluxo de traballo, Trazabilidade en Git e Reunións de Defensa (cada 10–15 días)
 
-1. **Inicio de tarefa:**
+> **Regra de trazabilidade en Git (Commits obrigatorios en cada cambio de estado):**  
+> Dado que o taboleiro e as tarefas se xestionan en Markdown, **o historial de Git é a fonte de verdade para auditar os tempos e a evolución do proxecto**. Por tanto, **en cada cambio de estado dunha tarefa é obrigatorio facer un commit específico** que rexistre a transición (data/hora exacta) e vencelle o código desenvolvido co ID da tarefa (`T1`, `T2`...).
+
+1. **Inicio de tarefa (`Selected` → `In Progress`):**
    - Tomar a seguinte tarefa seleccionada en `BOARD.md` (que vén de `BACKLOG.md -> Ready`).
-   - Movela á táboa **En progreso** en `BOARD.md` e actualizar o estado na súa ficha `tasks/tarefa-XX-...md`.
+   - Movela á táboa **En progreso** en `BOARD.md` e actualizar o estado e a `Data de inicio` na súa ficha `tasks/tarefa-XX-...md`.
+   - **Commit de inicio obrigatorio:** Rexistrar o cambio de estado antes de empezar a desenvolver (ex. `chore(T2): iniciar tarefa T2 en BOARD`).
 2. **Execución baixo o protocolo AIDD:**
    - Seguir as fases de Análise → Deseño → Planificación → Implementación → Validación → Documentación.
+   - Incluír o identificador da tarefa nos commits de código e documentación (ex. `feat(T2): ...`, `test(T2): ...`) para manter a trazabilidade do que se fixo en cada tarefa.
    - Ir anotando na ficha da tarefa as horas dedicadas e as observacións relevantes sobre o comportamento da IA.
-3. **Paso a Revisión (`In Review`):**
+3. **Paso a Revisión (`In Progress` → `In Review`):**
    - Verificar todos os puntos da *Definition of Done* da ficha (especialmente os tests unitarios e/ou E2E).
-   - Cubrir na propia ficha a sección **"Rexistro de emprego da IA"**.
+   - Cubrir na propia ficha a sección **"Rexistro de emprego da IA"**, as horas reais e a data de finalización.
    - Mover a tarefa á sección **Pendentes de revisión e defensa** en `BOARD.md`.
+   - **Commit de paso a revisión obrigatorio:** Rexistrar que a tarefa está rematada polo estudante e lista para defender (ex. `chore(T2): pasar T2 a revision e cubrir rexistro IA`).
 4. **Reunión de seguimento, defensa e avaliación formativa (cada 10–15 días):**
    - No desenvolvemento asistido por IA, un axente pode xerar unha funcionalidade en poucas horas, creando o risco de acumular **débeda cognitiva** (*Cognitive Debt*): código que aparentemente funciona pero cuxo deseño, integración ou efectos secundarios o estudante non controla.
    - Por tanto, para que unha tarefa pase de `BOARD.md (In Review)` ao histórico `Done` de `BACKLOG.md`, **o estudante debe DEFENDER o traballo realizado** nunha avaliación continua e formativa centrada en:
      1. **Control da arquitectura:** Demostrar que a estrutura xeral do proxecto se mantén baixo control e evoluciona conforme ao esperado, explicando que compoñentes/módulos interveñen e por que se tomou ese camiño arquitectónico (non se trata de auditar ou memorizar cada liña de código xerada, senón de dominar o deseño e a integración).
      2. **Garantía mediante tests (Unitarios e E2E):** Demostrar con probas automatizadas (unitarias, de integración ou *end-to-end*) que a funcionalidade cumpre os requisitos, cobre casos límite e non introduce regresións.
      3. **Responsabilidade (*Ownership*) ante fallos:** O estudante é o responsable último do código entregado. Debe demostrar supervisión sobre o que fixo o axente e ser quen de responder, diagnosticar e corrixir calquera fallo inesperado ou comportamento non supervisado que xurda.
-   - Unha vez superada a defensa, o titor pasa a tarefa a `Done` en `BACKLOG.md` e planifícanse as tarefas do seguinte ciclo. Se se detecta unha débeda cognitiva elevada ou falta de garantías nos tests, a tarefa permanece en revisión ata consolidarse.
+   - **Commit de validación (`In Review` → `Done`):** Unha vez superada a defensa, pásase a tarefa ao histórico `Done` de `BACKLOG.md`, selecciónanse as tarefas do seguinte ciclo en `BOARD.md` e faise un commit de peche de ciclo (ex. `chore(backlog): validar T2 en Done e planificar seguinte ciclo`). Se se detecta unha débeda cognitiva elevada ou falta de garantías nos tests, a tarefa permanece en revisión ata consolidarse.

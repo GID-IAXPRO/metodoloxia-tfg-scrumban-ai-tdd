@@ -33,6 +33,7 @@ En tempos de desenvolvemento asistido por IA, as tarefas poden avanzar moi rápi
 | **Iteracións / Ciclos** | Períodos de traballo de 10–15 días orientados a entregas verificables e defendibles. |
 | **Límite WIP (*Work In Progress*)** | **Unha única tarefa de desenvolvemento importante en `In Progress`.** Evita acumular código xerado por IA sen probar nin asimilar. |
 | **Estimación e control** | Rexistro de horas estimadas vs. horas realmente dedicadas (implementación vs. revisión) sobre o total de 300 h. |
+| **Trazabilidade en Git** | **Commit obrigatorio en cada cambio de estado da tarefa** (`Selected` → `In Progress` → `In Review` → `Done`) e referencia ao ID da tarefa (`T1`, `T2`...) nos commits de código para auditar tempos e avances. |
 
 ### Categorías de tarefas (Etiquetas)
 
@@ -83,6 +84,7 @@ Unha tarefa só se considera `Done` cando cumpre **todos** estes puntos:
 4. **A débeda cognitiva está baixo control:** o estudante comprende o deseño implementado, defendeu a solución na reunión de seguimento e asume a responsabilidade (*ownership*) ante posibles fallos.
 5. A documentación (e as *skills* / regras de IA, se aplica) está actualizada.
 6. **A sección "Rexistro de emprego da IA" da ficha da tarefa está completamente cuberta.**
+7. **Rexistráronse en Git os commits correspondentes a cada cambio de estado da tarefa** (inicio, paso a revisión e validación a `Done`).
 
 ---
 
