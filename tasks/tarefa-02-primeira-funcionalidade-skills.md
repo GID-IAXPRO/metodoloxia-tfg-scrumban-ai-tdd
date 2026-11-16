@@ -59,7 +59,7 @@ O obxectivo desta tarefa é dobre:
 | **Tests** | |
 | **Revisión** | |
 | **Tempo total dedicado** | |
-| **Tempo de revisión/corrección** | |
+| **Esforzo de supervisión/corrección (% dentro do total)** | *(Porcentaxe estimada do tempo total dedicada a supervisar, depurar ou corrixir o xerado pola IA: Baixo <20% / Medio 20–50% / Alto >50%)* |
 | **Resultado** | |
 | **Observacións** | *(Detallar que erros ou desviacións arquitectónicas cometeu a IA e como se corrixiron)* |
 

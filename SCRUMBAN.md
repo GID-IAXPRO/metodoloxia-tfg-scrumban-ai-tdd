@@ -32,7 +32,7 @@ En tempos de desenvolvemento asistido por IA, as tarefas poden avanzar moi rápi
 | **Taboleiro Operativo (`BOARD.md`)** | Fluxo do ciclo: `Selected` → `In Progress` → `In Review / Ready for Defense`. Xestionado polo estudante. |
 | **Iteracións / Ciclos** | Períodos de traballo de 10–15 días orientados a entregas verificables e defendibles. |
 | **Límite WIP (*Work In Progress*)** | **Unha única tarefa de desenvolvemento importante en `In Progress`.** Evita acumular código xerado por IA sen probar nin asimilar. |
-| **Estimación e control** | Rexistro de horas estimadas vs. horas realmente dedicadas (implementación vs. revisión) sobre o total de 300 h. |
+| **Estimación e control** | Rexistro de horas estimadas vs. horas totais realmente dedicadas (indicando que porcentaxe estimada dese tempo se investiu en supervisión/corrección) sobre o total de 300 h. |
 | **Trazabilidade en Git** | **Commit obrigatorio en cada cambio de estado da tarefa** (`Selected` → `In Progress` → `In Review` → `Done`) e referencia ao ID da tarefa (`T1`, `T2`...) nos commits de código para auditar tempos e avances. |
 
 ### Categorías de tarefas (Etiquetas)
@@ -58,7 +58,7 @@ Cada reunión estrutúrase en dous bloques e actúa como mecanismo de **avaliaci
      - **Control arquitectónico:** Explicar como encaixa a solución na arquitectura do sistema, que compoñentes se crearon/modificaron e verificar que a arquitectura evoluciona conforme ao esperado (non se esixe auditar ou memorizar cada liña individual de código, senón ter o control do deseño e das decisións técnicas).
      - **Verificación mediante tests (Unitarios e E2E):** Demostrar que se incorporaron probas automatizadas (unitarias, de integración ou *end-to-end*) que validan o comportamento esperado e protexen fronte a regresións.
      - **Responsabilidade (*Ownership*) e supervisión:** O estudante responde do funcionamento do sistema; debe explicar onde houbo que corrixir ou guiar á IA e demostrar capacidade para diagnosticar e resolver fallos inesperados ou comportamentos non supervisados.
-     - **Análise de tempos e *skills*:** Revisar as horas dedicadas (implementación vs. revisión) e que aprendizaxes se incorporan ás *skills* ou regras de contexto do proxecto.
+     - **Análise de tempos e *skills*:** Revisar as horas totais dedicadas, a proporción dese tempo que requiriu supervisión/corrección do xerado pola IA e que aprendizaxes se incorporan ás *skills* ou regras de contexto do proxecto.
 2. **Planificación do seguinte período:**
    - Revisar e actualizar `BACKLOG.md` (se entra unha tarefa nova importante, avaliar que outra se pospón para respectar as 300 h).
    - Seleccionar as próximas tarefas `Ready` para pasalas ao `BOARD.md` do novo ciclo.
@@ -134,8 +134,8 @@ Non é necesario gardar todas as conversas completas coas ferramentas de IA, per
 | **Código** | Grao de xeración (parcial/total, autónoma/guiada) |
 | **Tests** | Uso da IA na xeración e deseño de casos de proba (unitarios / E2E) |
 | **Revisión** | Uso da IA para revisión de código ou detección de bugs |
-| **Tempo total dedicado** | Horas totais investidas na tarefa (ex. *6 h*) |
-| **Tempo de revisión/corrección** | Horas dedicadas a supervisar, depurar e corrixir o xerado pola IA (ex. *1,5 h*) |
+| **Tempo total dedicado** | Horas totais investidas na tarefa, que computan para as 300 h do proxecto (ex. *6 h*) |
+| **Esforzo de supervisión/corrección (% dentro do total)** | Porcentaxe orientativa ou nivel do *Tempo total dedicado* investido en comprender, depurar e corrixir o xerado pola IA (ex. *Baixo (<20%) / Medio (20–50%) / Alto (>50%), ~25%*) |
 | **Resultado** | *Aceptado sen cambios* / *Aceptado con modificacións* / *Parcialmente descartado* / *Reescrito* |
 | **Observacións** | Desviacións arquitectónicas, erros cometidos pola IA, limitacións ou acertos destacables |
 
@@ -144,7 +144,7 @@ Non é necesario gardar todas as conversas completas coas ferramentas de IA, per
 Coas fichas acumuladas en `tasks/`, realizarase un **estudo de caso observacional** estruturado en catro dimensións:
 
 1. **Produtividade:**
-   - Horas totais por tarefa, tempo de implementación vs. tempo de supervisión/corrección do xerado pola IA, e número de tarefas completadas.
+   - Horas totais por tarefa (fronte ás estimadas), proporción estimada do tempo dedicada á supervisión/corrección do xerado pola IA fronte á implementación directa, e número de tarefas completadas.
 2. **Calidade do software e estabilidade:**
    - Evolución da cobertura de tests (unitarios, integración e E2E), coherencia arquitectónica, defectos detectados na validación e resultados da auditoría.
 3. **Eficacia do uso da IA:**

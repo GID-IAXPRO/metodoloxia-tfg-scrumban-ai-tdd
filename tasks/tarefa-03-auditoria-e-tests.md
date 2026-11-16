@@ -59,7 +59,7 @@ Esta tarefa combina dous obxectivos orientados a asegurar a calidade técnica do
 | **Tests** | *(Detallar a calidade dos tests unitarios / E2E xerados pola IA)* |
 | **Revisión** | *(Detallar a precisión da IA na auditoría: problemas reais vs. falsos positivos)* |
 | **Tempo total dedicado** | |
-| **Tempo de revisión/corrección** | |
+| **Esforzo de supervisión/corrección (% dentro do total)** | *(Porcentaxe estimada do tempo total dedicada a supervisar, depurar ou corrixir o xerado pola IA: Baixo <20% / Medio 20–50% / Alto >50%)* |
 | **Resultado** | |
 | **Observacións** | |
 

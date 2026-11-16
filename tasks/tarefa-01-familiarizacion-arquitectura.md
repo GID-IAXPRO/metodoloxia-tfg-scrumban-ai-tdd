@@ -60,7 +60,7 @@ Ademais, nesta primeira tarefa establécese o punto de partida metodolóxico coa
 | **Tests** | *(Execución da suite existente para establecer a liña base)* |
 | **Revisión** | *(Contraste das explicacións da IA co código real)* |
 | **Tempo total dedicado** | |
-| **Tempo de revisión/corrección** | |
+| **Esforzo de supervisión/corrección (% dentro do total)** | *(Porcentaxe estimada do tempo total investida en contrastar e verificar as explicacións da IA: Baixo <20% / Medio 20–50% / Alto >50%)* |
 | **Resultado** | |
 | **Observacións** | *(Rexistrar se a IA interpretou ben a arquitectura ou se cometeu erros ao explicar algún compoñente)* |
 

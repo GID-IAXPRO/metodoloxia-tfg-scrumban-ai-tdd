@@ -49,8 +49,8 @@ Explicación breve de que problema resolve esta tarefa, por que se aborda neste 
 | **Código** | *(Grao de xeración parcial/total, refactorización, etc.)* |
 | **Tests** | *(Uso da IA para deseñar ou xerar probas unitarias / E2E)* |
 | **Revisión** | *(Uso da IA para revisar código ou buscar erros)* |
-| **Tempo total dedicado** | *(X horas)* |
-| **Tempo de revisión/corrección** | *(Y horas dedicadas a supervisar, depurar ou corrixir o xerado pola IA)* |
+| **Tempo total dedicado** | *(X horas totais investidas na tarefa)* |
+| **Esforzo de supervisión/corrección (% dentro do total)** | *(Porcentaxe estimada do tempo total anterior dedicada a supervisar, depurar ou corrixir o xerado pola IA: Baixo <20% / Medio 20–50% / Alto >50%)* |
 | **Resultado** | *(Aceptada sen cambios / Aceptada con modificacións / Reescrita)* |
 | **Observacións** | *(Desviacións arquitectónicas, erros detectados na IA, falsos positivos, limitacións, vantaxes)* |
 

@@ -65,7 +65,7 @@ Cada tarefa ten un ficheiro con nome `tarefa-XX-nome-descritivo.md` que inclúe:
 1. **Metadatos:** Estado, prioridade (*Must/Should/Could*), etiquetas (`learning`, `feature`, `testing`, `refactoring`, `ai-evaluation`, `documentation`), horas estimadas e horas reais.
 2. **Obxectivos e subtarefas:** Que se quere conseguir e que pasos se deben dar.
 3. **Entregables e *Definition of Done*:** Criterios verificables para dar a tarefa por lista para revisión.
-4. **Rexistro de emprego da IA:** Unha ficha estandarizada que **se cobre obrigatoriamente ao rematar a tarefa**, documentando ferramentas/modelos usados, intervención por fases, tempos de implementación vs. revisión, erros da IA detectados e aprendizaxes ou *skills* xeradas.
+4. **Rexistro de emprego da IA:** Unha ficha estandarizada que **se cobre obrigatoriamente ao rematar a tarefa**, documentando ferramentas/modelos usados, intervención por fases, tempo total dedicado e proporción estimada de supervisión/corrección sobre ese total, erros da IA detectados e aprendizaxes ou *skills* xeradas.
 
 ---
 
